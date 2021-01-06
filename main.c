@@ -18,17 +18,25 @@ int main(int argc, char * argv[]) {
     cfsetospeed(&terminal_config, B1200); // TODO: Error handling
     cfsetispeed(&terminal_config, B1200); // TODO: Error handling
     cfmakeraw(&terminal_config); // Set to pass raw bytes
+    tcsetattr(fd, TCSANOW, &terminal_config);
 
-    char * read_buffer;
+    char * read_buffer = NULL;
+    char render_buffer[1024];
+
+    /* Basic Read */
     read_buffer = send_basic_read_request(read_buffer);
+    Basic_Read_Response *basic_read_response = parse_basic_read_response(read_buffer);
+    render_basic_info(render_buffer, basic_read_response);
+    free(basic_read_response);
+    printf("--- Controller Info ---------\n%s", render_buffer);
 
-    Connect_Response *connect_response = parse_connect_response(read_buffer);
-    char render_buffer[256];
-    render_general_info(render_buffer, connect_response);
+    /* General Read */
+    read_buffer = send_general_read_request(read_buffer);
+    General_Read_Response *general_read_response = parse_general_read_response(read_buffer);
+    render_general_info(render_buffer, general_read_response);
+    free(general_read_response);
+    printf("\n--- General Settings ---------\n%s", render_buffer);
 
-    // Print General
-    printf("%s", render_buffer);
-    
     free(read_buffer);
     close(fd);
 }

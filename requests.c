@@ -6,14 +6,13 @@
 extern int fd;
 extern struct termios terminal_config;
 const int RESPONSE_HEADER_BYTESIZE = 2;
-const char connect_command[] = {0x11, 0x51, 0x04, 0xB0, 0x05};
 
-char * send_basic_read_request(char * read_buffer) {
-    terminal_config.c_cc[VMIN] = 2;
-    tcsetattr(fd, TCSANOW, &terminal_config);
+const char basic_read_command[] = {0x11, 0x51, 0x04, 0xB0, 0x05};
+const char general_read_command[] = {0x11, 0x52};
 
-    write(fd, connect_command, sizeof(connect_command));
-    read_buffer = realloc(read_buffer, sizeof(char) * 2);
+char * _send_read_command(char * command, char * read_buffer) {
+    write(fd, command, sizeof(command));
+    read_buffer = realloc(read_buffer, sizeof(char) * RESPONSE_HEADER_BYTESIZE);
 
     // Read response header
     terminal_config.c_cc[VMIN] = RESPONSE_HEADER_BYTESIZE;
@@ -27,5 +26,13 @@ char * send_basic_read_request(char * read_buffer) {
     read_buffer = realloc(read_buffer, sizeof(char) * response_length);
     read(fd, read_buffer, response_length * sizeof(char));
 
-    return read_buffer;
+    return read_buffer;    
+}
+
+char * send_basic_read_request(char * read_buffer) {
+    return _send_read_command(basic_read_command, read_buffer);
+}
+
+char * send_general_read_request(char * read_buffer) {
+    return _send_read_command(general_read_command, read_buffer);
 }

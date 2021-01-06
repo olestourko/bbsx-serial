@@ -14,19 +14,48 @@ extern char * send_pedal_read_request();
 extern char * send_throttle_read_request();
 
 // Responses
-struct Connect_Response {
+struct Basic_Read_Response {
     char manufacturer[5];
     char model[5];
     char hardware_version[4];
     char firmware_version[8];
-    int max_current;
+    char max_current;
     char voltage;
 };
-typedef struct Connect_Response Connect_Response;
+struct General_Read_Response {
+    char low_voltage_cutoff;
+    char current_limit;
+    char assist_0_current;
+    char assist_1_current;
+    char assist_2_current;
+    char assist_3_current;
+    char assist_4_current;
+    char assist_5_current;
+    char assist_6_current;
+    char assist_7_current;
+    char assist_8_current;
+    char assist_9_current;
+    char assist_0_speed;
+    char assist_1_speed;
+    char assist_2_speed;
+    char assist_3_speed;
+    char assist_4_speed;
+    char assist_5_speed;
+    char assist_6_speed;
+    char assist_7_speed;
+    char assist_8_speed;
+    char assist_9_speed;
+    char wheel_diameter_inches;
+    char speedmeter_byte;
+};
 
-extern Connect_Response * parse_connect_response(char * response_body);
+typedef struct Basic_Read_Response Basic_Read_Response;
+typedef struct General_Read_Response General_Read_Response;
+extern Basic_Read_Response * parse_basic_read_response(char * response_body);
+extern General_Read_Response * parse_general_read_response(char * response_body);
 
 // Rendering
-extern void render_general_info(char * render_buffer, Connect_Response *response_ptr);
+extern void render_basic_info(char * render_buffer, Basic_Read_Response *response_ptr);
+extern void render_general_info(char * render_buffer, General_Read_Response *response_ptr);
 
 #endif
