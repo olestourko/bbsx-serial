@@ -37,6 +37,13 @@ int main(int argc, char * argv[]) {
     free(general_read_response);
     printf("\n--- General Settings ---------\n%s", render_buffer);
 
+    /* Throttle Read */
+    read_buffer = send_throttle_read_request(read_buffer);
+    Throttle_Read_Response *throttle_read_response = parse_throttle_read_response(read_buffer);
+    render_throttle_info(render_buffer, throttle_read_response);
+    free(throttle_read_response);
+    printf("\n--- Throttle Settings ---------\n%s", render_buffer);
+
     free(read_buffer);
     close(fd);
 }

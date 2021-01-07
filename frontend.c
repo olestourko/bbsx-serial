@@ -111,7 +111,6 @@ void render_general_info(char * render_buffer, General_Read_Response *response_p
     }
 
     char * speedmeter_model;
-
     // TODO: Take endianness into account
     switch(response_ptr->speedmeter_byte & 0b1100000) {
         case 0b00:
@@ -180,3 +179,38 @@ void render_general_info(char * render_buffer, General_Read_Response *response_p
         response_ptr->speedmeter_byte & 0b00111111 // Not sure if this is correct
     );
 };
+
+void render_throttle_info(char * render_buffer, Throttle_Read_Response *response_ptr) {
+    char * mode;
+    switch(response_ptr->mode) {
+        case 0x00:
+            mode = "Speed";
+            break;
+        case 0x01:
+            mode = "current";
+            break;
+    }
+
+    char speed_limit[20];
+    if (response_ptr->speed_limit == 0xFF) {
+        sprintf(speed_limit, "Use Display Setting");
+    } else {
+        sprintf(speed_limit, "%dkm/h", response_ptr->speed_limit);
+    }
+
+    sprintf(
+        render_buffer,
+        "Start Voltage: %dmV\n"
+        "End Voltage: %dmV\n"
+        "Mode: %s\n"
+        "Assist Level: %d\n"
+        "Speed Limit: %s\n"
+        "Start Current: %d%%\n",
+        response_ptr->start_voltage * 100,
+        response_ptr->end_voltage * 100,
+        mode,
+        response_ptr->assist_level,
+        speed_limit,
+        response_ptr->start_current
+    );
+}

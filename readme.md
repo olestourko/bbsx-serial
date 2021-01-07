@@ -34,6 +34,14 @@ Assist Level 9 - Speed Limit: 100%
 Wheel Diamater: 26"
 Speedmeter Model: External
 Speedmeter Signals: 01
+
+--- Throttle Settings ---------
+Start Voltage: 1100mV
+End Voltage: 3500mV
+Mode: Speed
+Assist Level: 3
+Speed Limit: 17km/h
+Start Current: 20
 ```
 
 ## Terminal Requirements
@@ -56,6 +64,12 @@ Speedmeter Signals: 01
 |:---|:---|:---
 |0|0x11|Read
 |1|0x52|General Settings
+
+### Throttle Read Request
+|Byte Number|Byte|Meaning|
+|:---|:---|:---
+|0|0x11|Read
+|1|0x54|Throttle Settings
 
 ## TODO
 - `pedal read` command

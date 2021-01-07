@@ -48,14 +48,25 @@ struct General_Read_Response {
     char wheel_diameter_inches;
     char speedmeter_byte;
 };
+struct Throttle_Read_Response {
+    char start_voltage;
+    char end_voltage;
+    char mode;
+    char assist_level;
+    char speed_limit;
+    char start_current;
+};
 
 typedef struct Basic_Read_Response Basic_Read_Response;
 typedef struct General_Read_Response General_Read_Response;
+typedef struct Throttle_Read_Response Throttle_Read_Response;
 extern Basic_Read_Response * parse_basic_read_response(char * response_body);
 extern General_Read_Response * parse_general_read_response(char * response_body);
+extern Throttle_Read_Response * parse_throttle_read_response(char * response_body);
 
 // Rendering
 extern void render_basic_info(char * render_buffer, Basic_Read_Response *response_ptr);
 extern void render_general_info(char * render_buffer, General_Read_Response *response_ptr);
+extern void render_throttle_info(char * render_buffer, Throttle_Read_Response *response_ptr);
 
 #endif

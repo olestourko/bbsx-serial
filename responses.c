@@ -46,3 +46,13 @@ General_Read_Response * parse_general_read_response(char * response_body) {
 
     return response;
 }
+
+Throttle_Read_Response * parse_throttle_read_response(char * response_body) {
+    Throttle_Read_Response *response = (Throttle_Read_Response *) malloc(sizeof(Throttle_Read_Response));
+    response->start_voltage = response_body[0];
+    response->end_voltage = response_body[1];
+    response->mode = response_body[2];
+    response->assist_level = response_body[3];
+    response->speed_limit = response_body[4];
+    response->start_current = response_body[5];
+}
