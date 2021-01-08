@@ -65,6 +65,12 @@ Start Current: 20
 |0|0x11|Read
 |1|0x52|General Settings
 
+### Pedal Read Request
+|Byte Number|Byte|Meaning|
+|:---|:---|:---
+|0|0x11|Read
+|1|0x53|Pedal Settings
+
 ### Throttle Read Request
 |Byte Number|Byte|Meaning|
 |:---|:---|:---
@@ -73,7 +79,6 @@ Start Current: 20
 
 ## TODO
 - `pedal read` command
-- `throttle read` command
 - `general save` command
 - `pedal save` command
 - `throttle save` command

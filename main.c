@@ -37,6 +37,11 @@ int main(int argc, char * argv[]) {
     free(general_read_response);
     printf("\n--- General Settings ---------\n%s", render_buffer);
 
+    /* Pedal Read */
+    read_buffer = send_pedal_read_request(read_buffer);
+    Pedal_Read_Response *pedal_read_response = parse_pedal_read_response(read_buffer);
+    free(pedal_read_response);
+
     /* Throttle Read */
     read_buffer = send_throttle_read_request(read_buffer);
     Throttle_Read_Response *throttle_read_response = parse_throttle_read_response(read_buffer);

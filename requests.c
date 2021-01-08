@@ -9,6 +9,7 @@ const int RESPONSE_HEADER_BYTESIZE = 2;
 
 const char basic_read_command[] = {0x11, 0x51, 0x04, 0xB0, 0x05};
 const char general_read_command[] = {0x11, 0x52};
+const char pedal_read_command[] = {0x11, 0x53};
 const char throttle_read_command[] = {0x11, 0x54};
 
 char * _send_read_command(char * command, char * read_buffer) {
@@ -38,6 +39,11 @@ char * send_general_read_request(char * read_buffer) {
     return _send_read_command(general_read_command, read_buffer);
 }
 
+char * send_pedal_read_request(char * read_buffer) {
+    return _send_read_command(pedal_read_command, read_buffer);
+}
+
 char * send_throttle_read_request(char * read_buffer) {
     return _send_read_command(throttle_read_command, read_buffer);
 }
+

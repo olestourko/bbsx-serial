@@ -47,6 +47,20 @@ General_Read_Response * parse_general_read_response(char * response_body) {
     return response;
 }
 
+Pedal_Read_Response * parse_pedal_read_response(char * response_body) {
+    Pedal_Read_Response *response = (Pedal_Read_Response *) malloc(sizeof(Pedal_Read_Response));
+    response->pedal_type = response_body[0];
+    response->assist_level = response_body[1];
+    response->speed_limit = response_body[2];
+    response->start_current = response_body[3];
+    response->slow_start_mode = response_body[4];
+    response->start_degree = response_body[5];
+    response->work_mode = response_body[6];
+    response->stop_delay = response_body[7];
+    response->stop_decay = response_body[8];
+    response->keep_current = response_body[9];
+}
+
 Throttle_Read_Response * parse_throttle_read_response(char * response_body) {
     Throttle_Read_Response *response = (Throttle_Read_Response *) malloc(sizeof(Throttle_Read_Response));
     response->start_voltage = response_body[0];
