@@ -180,6 +180,68 @@ void render_general_info(char * render_buffer, General_Read_Response *response_p
     );
 };
 
+void render_pedal_info(char * render_buffer, Pedal_Read_Response *response_ptr) {
+    char * pedal_type = "None";
+    switch(response_ptr->pedal_type) {
+        case 0x01:
+            pedal_type = "DH-Sensor-12";
+            break;
+        case 0x02:
+            pedal_type = "BB-Sensor-32";
+            break;
+        case 0x03:
+            pedal_type = "DoubleSignal-24";
+            break;
+    }
+
+    char assist_level[20];
+    if (response_ptr->assist_level == 0xFF) {
+        sprintf(assist_level, "Use Display Setting");
+    } else {
+        sprintf(assist_level, "%d", response_ptr->assist_level);
+    }
+
+    char speed_limit[20];
+    if (response_ptr->speed_limit == 0xFF) {
+        sprintf(speed_limit, "Use Display Setting");
+    } else {
+        sprintf(speed_limit, "%dkm/h", response_ptr->speed_limit);
+    }
+
+    char work_mode[40];
+    if (response_ptr->work_mode == 0xFF) {
+        sprintf(work_mode, "Undetermined");
+    } else {
+        sprintf(work_mode, "%d (Angular Speed of Pedal / Wheel * 10)", response_ptr->work_mode);
+    }
+
+    sprintf(
+        render_buffer,
+        "Pedal Type: %s\n"
+        "Assist Level: %s\n"
+        "Speed Limit: %s\n"
+        "Start Current: %d%%\n"
+        "Start Mode: %d\n"
+        "Startup Degree: %d\n"
+        "Work Mode: %s\n"
+        "Stop Delay %dms\n"
+        "Current Decay: %d\n"
+        "Stop Decay: %dms\n"
+        "Kepp Current: %d%%\n",
+        pedal_type,
+        assist_level,
+        speed_limit,
+        response_ptr->start_current,
+        response_ptr->slow_start_mode,
+        response_ptr->start_degree,
+        work_mode,
+        response_ptr->stop_delay * 10,
+        response_ptr->current_decay,
+        response_ptr->stop_decay * 10,
+        response_ptr->keep_current
+    );
+}
+
 void render_throttle_info(char * render_buffer, Throttle_Read_Response *response_ptr) {
     char * mode;
     switch(response_ptr->mode) {

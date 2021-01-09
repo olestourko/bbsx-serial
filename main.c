@@ -40,7 +40,9 @@ int main(int argc, char * argv[]) {
     /* Pedal Read */
     read_buffer = send_pedal_read_request(read_buffer);
     Pedal_Read_Response *pedal_read_response = parse_pedal_read_response(read_buffer);
+    render_pedal_info(render_buffer, pedal_read_response);
     free(pedal_read_response);
+    printf("\n--- Pedal Settings ---------\n%s", render_buffer);
 
     /* Throttle Read */
     read_buffer = send_throttle_read_request(read_buffer);
