@@ -35,6 +35,19 @@ Wheel Diamater: 26"
 Speedmeter Model: External
 Speedmeter Signals: 01
 
+--- Pedal Settings ---------
+Pedal Type: DoubleSignal-24
+Assist Level: Use Display Setting
+Speed Limit: Use Display Setting
+Start Current: 20%
+Start Mode: 6
+Startup Degree: 20
+Work Mode: 10 (Angular Speed of Pedal / Wheel * 10)
+Stop Delay 250ms
+Current Decay: 0
+Stop Decay: 80ms
+Kepp Current: 20%
+
 --- Throttle Settings ---------
 Start Voltage: 1100mV
 End Voltage: 3500mV
