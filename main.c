@@ -3,15 +3,43 @@
 #include <unistd.h>
 #include <termios.h>
 #include <stdio.h>
+#include <errno.h>
 #include "bbsx_serial.h"
 
 int fd;
 struct termios terminal_config;
 
+void print_usage() {
+    printf("Usage: bbsx-serial -d <device>\n");
+    exit(2);
+}
+
 int main(int argc, char * argv[]) {
+    int option;
+    char * device = NULL;
+    while ((option = getopt(argc, argv, "d:")) !=-1) {
+        switch (option) {
+            case 'd':
+                device = optarg;
+                break;
+            case '?':
+                printf("Unknown option: %c\n", optopt);
+                exit(2);
+        }
+    }
+
+    if (device == NULL) {
+        print_usage();
+    }
+
     // https://www.cmrr.umn.edu/~strupp/serial.html
 
-    fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NDELAY);
+    fd = open(device, O_RDWR | O_NOCTTY | O_NDELAY);
+    if (fd == -1) {
+        printf("Error %d opening %s\n", errno, device);
+        exit(2);
+    }
+
     fcntl(fd, F_SETFL, 0);
 
     tcgetattr(fd, &terminal_config);
