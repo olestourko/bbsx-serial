@@ -3,11 +3,67 @@
 #include <unistd.h>
 #include <termios.h>
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
+#include <libconfig.h>
 #include "bbsx_serial.h"
 
 int fd;
 struct termios terminal_config;
+
+void read_config_file() {
+    /* Open config file */
+    config_t cfg;
+    config_setting_t *setting;
+    config_init(&cfg);
+    if (!config_read_file(&cfg, "config.cfg")) {
+        fprintf(stdout, "%s:%d - %s\n", config_error_file(&cfg),
+        config_error_line(&cfg), config_error_text(&cfg));
+    }
+
+    int r;
+    int int_value;
+    const char *str_value;
+    const char * key;
+    /* Read throttle config */
+    Throttle_Read_Response throttle_data;
+    key = "throttle.start_voltage";
+    if (r = config_lookup_int(&cfg, key, &int_value)) {
+        throttle_data.start_voltage = int_value;
+    }
+    key = "throttle.end_voltage";
+    if (r = config_lookup_int(&cfg, key, &int_value)) {
+        throttle_data.end_voltage = int_value;
+    }
+    key = "throttle.mode";
+    if (r = config_lookup_string(&cfg, key, &str_value)) {
+        if (strcmp(str_value, "speed") == 0) {
+            throttle_data.mode = 0x00;
+        } else if (strcmp(str_value, "current") == 0) {
+            throttle_data.mode = 0x01;
+        }
+    }
+    key = "throttle.assist_level";
+    if (r = config_lookup_int(&cfg, key, &int_value)) {
+        throttle_data.assist_level = int_value;
+    }
+    key = "throttle.speed_limit";
+    if (r = config_lookup_int(&cfg, key, &int_value)) {
+        throttle_data.speed_limit = int_value;
+    } else if (r = config_lookup_string(&cfg, key, &str_value)) {
+        if (strcmp(str_value, "by_display") == 0) {
+            throttle_data.speed_limit = 0xff;
+        }
+    }
+
+    key = "throttle.start_current";
+    if (r = config_lookup_int(&cfg, key, &int_value)) {
+        throttle_data.start_current = int_value;
+    }
+    char render_buffer[1024];
+    render_throttle_info(render_buffer, &throttle_data);
+    printf("\n--- Throttle Settings (Config File) ---------\n%s", render_buffer);
+}
 
 void print_usage() {
     printf("Usage: bbsx-serial -d <device>\n");
@@ -15,6 +71,7 @@ void print_usage() {
 }
 
 int main(int argc, char * argv[]) {
+    /* Read terminal args */
     int option;
     char * device = NULL;
     while ((option = getopt(argc, argv, "d:")) !=-1) {
@@ -32,8 +89,9 @@ int main(int argc, char * argv[]) {
         print_usage();
     }
 
-    // https://www.cmrr.umn.edu/~strupp/serial.html
+    read_config_file();
 
+    // https://www.cmrr.umn.edu/~strupp/serial.html
     fd = open(device, O_RDWR | O_NOCTTY | O_NDELAY);
     if (fd == -1) {
         printf("Error %d opening %s\n", errno, device);
