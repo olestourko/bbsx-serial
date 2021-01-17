@@ -129,9 +129,8 @@ void read_config_file() {
         }
     }
     config_lookup_uchar(&cfg, "throttle.assist_level", &throttle_data.assist_level);
-    if (r = config_lookup_int(&cfg, "throttle.speed_limit", &int_value)) {
-        throttle_data.speed_limit = int_value;
-    } else if (r = config_lookup_string(&cfg, "throttle.speed_limit", &str_value)) {
+    if (!(config_lookup_uchar(&cfg, "throttle.speed_limit", &throttle_data.speed_limit))
+    && config_lookup_string(&cfg, "throttle.speed_limit", &str_value)) {
         if (strcmp(str_value, "by_display") == 0) {
             throttle_data.speed_limit = 0xff;
         }
