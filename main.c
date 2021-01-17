@@ -69,18 +69,53 @@ void read_config_file() {
         }
     }
     if (r = config_lookup_string(&cfg, "general.speedmeter", &str_value)) {
-        if (strcmp(str_value, "external")) {
+        if (strcmp(str_value, "external") == 0) {
             general_data.speedmeter_byte = 0b00;
-        } else if (strcmp(str_value, "internal")) {
+        } else if (strcmp(str_value, "internal") == 0) {
             general_data.speedmeter_byte = 0b01;
-        } else if (strcmp(str_value, "motorphase")) {
+        } else if (strcmp(str_value, "motorphase") == 0) {
             general_data.speedmeter_byte = 0b10;
         }
     }
     // TODO: Speedmeter signals
-
     render_general_info(render_buffer, &general_data);
     printf("\n--- General Settings (Config File) ---------\n%s", render_buffer);
+
+    /* Read Pedal Config */
+    Pedal_Read_Response pedal_data;
+    if (r = config_lookup_string(&cfg, "pedal.pedal_type", &str_value)) {
+        if (strcmp(str_value, "None")) {
+            pedal_data.pedal_type = 0x00;
+        } else if (strcmp(str_value, "DH-Sensor-12")) {
+            pedal_data.pedal_type = 0x01;
+        } else if (strcmp(str_value, "BB-Sensor-32")) {
+            pedal_data.pedal_type = 0x02;
+        } else if (strcmp(str_value, "DoubleSignal-24")) {
+            pedal_data.pedal_type = 0x03;
+        }
+    }
+    if (!config_lookup_uchar(&cfg, "pedal.assist_level", &pedal_data.assist_level)
+    && config_lookup_string(&cfg, "pedal.assist_level", &str_value)) {
+        if (strcmp(str_value, "by_display") == 0) {
+            pedal_data.assist_level = 0xff;
+        }
+    }
+    if (!config_lookup_uchar(&cfg, "pedal.speed_limit", &pedal_data.speed_limit)
+    && config_lookup_string(&cfg, "pedal.speed_limit", &str_value)) {
+        if (strcmp(str_value, "by_display") == 0) {
+            pedal_data.speed_limit = 0xff;
+        }
+    }
+    config_lookup_uchar(&cfg, "pedal.start_current", &pedal_data.start_current);
+    config_lookup_uchar(&cfg, "pedal.slow_start_mode", &pedal_data.slow_start_mode);
+    config_lookup_uchar(&cfg, "pedal.start_degree", &pedal_data.start_degree);
+    config_lookup_uchar(&cfg, "pedal.work_mode", &pedal_data.work_mode);
+    config_lookup_uchar(&cfg, "pedal.stop_delay", &pedal_data.stop_delay);
+    config_lookup_uchar(&cfg, "pedal.current_decay", &pedal_data.current_decay);
+    config_lookup_uchar(&cfg, "pedal.stop_decay", &pedal_data.stop_decay);
+    config_lookup_uchar(&cfg, "pedal.keep_current", &pedal_data.keep_current);
+    render_pedal_info(render_buffer, &pedal_data);
+    printf("\n--- Pedal Settings (Config File) ---------\n%s", render_buffer);
 
     /* Read Throttle Config */
     Throttle_Read_Response throttle_data;

@@ -91,13 +91,11 @@ Start Current: 20
 |1|0x54|Throttle Settings
 
 ## TODO
-- `pedal read` command
 - `general save` command
 - `pedal save` command
 - `throttle save` command
 - Error handling
     - From controller responses
     - Device terminal setup and underlying read/write operations
-- Allow specifing the `/dev/tty*` that USB-UART adapter is on
 - Reading settings from a config file with `libconfig`
 - (Maybe) `ncurses` for interaction
