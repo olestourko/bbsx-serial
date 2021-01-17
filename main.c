@@ -11,10 +11,21 @@
 int fd;
 struct termios terminal_config;
 
+int config_lookup_uchar(config_t *cfg, char *key, unsigned char *address) {
+    /*  Wrapper for libconfig's config_lookup_int. Stores the value in an unsigned char address.
+    *   Prevents compiler warnings.
+    */
+    int v;
+    int r = config_lookup_int(cfg, key, &v);
+    if (r) {
+        *address = v;
+    }
+    return r;
+}
+
 void read_config_file() {
     /* Open config file */
     config_t cfg;
-    config_setting_t *setting;
     config_init(&cfg);
     if (!config_read_file(&cfg, "config.cfg")) {
         fprintf(stdout, "%s:%d - %s\n", config_error_file(&cfg),
@@ -24,43 +35,73 @@ void read_config_file() {
     int r;
     int int_value;
     const char *str_value;
-    const char * key;
-    /* Read throttle config */
+    char render_buffer[1024];
+
+    /* Read Basic Config */
+    General_Read_Response general_data;
+    config_lookup_uchar(&cfg, "general.low_voltage_cutoff", &general_data.low_voltage_cutoff);
+    config_lookup_uchar(&cfg, "general.current_limit", &general_data.current_limit);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_0.speed_limit", &general_data.assist_0_speed);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_0.current_limit", &general_data.assist_0_current);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_1.speed_limit", &general_data.assist_1_speed);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_1.current_limit", &general_data.assist_1_current);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_2.speed_limit", &general_data.assist_2_speed);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_2.current_limit", &general_data.assist_2_current);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_3.speed_limit", &general_data.assist_3_speed);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_3.current_limit", &general_data.assist_3_current);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_4.speed_limit", &general_data.assist_4_speed);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_4.current_limit", &general_data.assist_4_current);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_5.speed_limit", &general_data.assist_5_speed);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_5.current_limit", &general_data.assist_5_current);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_6.speed_limit", &general_data.assist_6_speed);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_6.current_limit", &general_data.assist_6_current);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_7.speed_limit", &general_data.assist_7_speed);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_7.current_limit", &general_data.assist_7_current);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_8.speed_limit", &general_data.assist_8_speed);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_8.current_limit", &general_data.assist_8_current);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_9.speed_limit", &general_data.assist_9_speed);
+    config_lookup_uchar(&cfg, "general.assist_levels.level_9.current_limit", &general_data.assist_9_current);
+    if (r = config_lookup_int(&cfg, "general.wheel_diameter", &int_value)) {
+        general_data.wheel_diameter_inches = int_value + 0x19;
+    } else if (r = config_lookup_string(&cfg, "general.wheel_diameter", &str_value)) {
+        if (strcmp(str_value, "700C") == 0) {
+            general_data.wheel_diameter_inches = 0x37;
+        }
+    }
+    if (r = config_lookup_string(&cfg, "general.speedmeter", &str_value)) {
+        if (strcmp(str_value, "external")) {
+            general_data.speedmeter_byte = 0b00;
+        } else if (strcmp(str_value, "internal")) {
+            general_data.speedmeter_byte = 0b01;
+        } else if (strcmp(str_value, "motorphase")) {
+            general_data.speedmeter_byte = 0b10;
+        }
+    }
+    // TODO: Speedmeter signals
+
+    render_general_info(render_buffer, &general_data);
+    printf("\n--- General Settings (Config File) ---------\n%s", render_buffer);
+
+    /* Read Throttle Config */
     Throttle_Read_Response throttle_data;
-    key = "throttle.start_voltage";
-    if (r = config_lookup_int(&cfg, key, &int_value)) {
-        throttle_data.start_voltage = int_value;
-    }
-    key = "throttle.end_voltage";
-    if (r = config_lookup_int(&cfg, key, &int_value)) {
-        throttle_data.end_voltage = int_value;
-    }
-    key = "throttle.mode";
-    if (r = config_lookup_string(&cfg, key, &str_value)) {
+    config_lookup_uchar(&cfg, "throttle.start_voltage", &throttle_data.start_voltage);
+    config_lookup_uchar(&cfg, "throttle.end_voltage", &throttle_data.end_voltage);
+    if (r = config_lookup_string(&cfg, "throttle.mode", &str_value)) {
         if (strcmp(str_value, "speed") == 0) {
             throttle_data.mode = 0x00;
         } else if (strcmp(str_value, "current") == 0) {
             throttle_data.mode = 0x01;
         }
     }
-    key = "throttle.assist_level";
-    if (r = config_lookup_int(&cfg, key, &int_value)) {
-        throttle_data.assist_level = int_value;
-    }
-    key = "throttle.speed_limit";
-    if (r = config_lookup_int(&cfg, key, &int_value)) {
+    config_lookup_uchar(&cfg, "throttle.assist_level", &throttle_data.assist_level);
+    if (r = config_lookup_int(&cfg, "throttle.speed_limit", &int_value)) {
         throttle_data.speed_limit = int_value;
-    } else if (r = config_lookup_string(&cfg, key, &str_value)) {
+    } else if (r = config_lookup_string(&cfg, "throttle.speed_limit", &str_value)) {
         if (strcmp(str_value, "by_display") == 0) {
             throttle_data.speed_limit = 0xff;
         }
     }
-
-    key = "throttle.start_current";
-    if (r = config_lookup_int(&cfg, key, &int_value)) {
-        throttle_data.start_current = int_value;
-    }
-    char render_buffer[1024];
+    config_lookup_uchar(&cfg, "throttle.start_current", &throttle_data.start_current);
     render_throttle_info(render_buffer, &throttle_data);
     printf("\n--- Throttle Settings (Config File) ---------\n%s", render_buffer);
 }
