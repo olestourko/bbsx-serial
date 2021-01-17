@@ -149,7 +149,7 @@ void render_general_info(char * render_buffer, General_Read_Response *response_p
         "Assist Level 7 - Speed Limit: %d%%\n"
         "Assist Level 8 - Speed Limit: %d%%\n"
         "Assist Level 9 - Speed Limit: %d%%\n"
-        "Wheel Diamater: %s\n"
+        "Wheel Diameter: %s\n"
         "Speedmeter Model: %s\n"
         "Speedmeter Signals: %02X\n",
         response_ptr->low_voltage_cutoff,
@@ -224,10 +224,10 @@ void render_pedal_info(char * render_buffer, Pedal_Read_Response *response_ptr) 
         "Start Mode: %d\n"
         "Startup Degree: %d\n"
         "Work Mode: %s\n"
-        "Stop Delay %dms\n"
+        "Stop Delay: %dms\n"
         "Current Decay: %d\n"
         "Stop Decay: %dms\n"
-        "Kepp Current: %d%%\n",
+        "Keep Current: %d%%\n",
         pedal_type,
         assist_level,
         speed_limit,

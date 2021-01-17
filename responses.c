@@ -57,8 +57,9 @@ Pedal_Read_Response * parse_pedal_read_response(char * response_body) {
     response->start_degree = response_body[5];
     response->work_mode = response_body[6];
     response->stop_delay = response_body[7];
-    response->stop_decay = response_body[8];
-    response->keep_current = response_body[9];
+    response->current_decay =  response_body[8];
+    response->stop_decay = response_body[9];
+    response->keep_current = response_body[10];
 }
 
 Throttle_Read_Response * parse_throttle_read_response(char * response_body) {
